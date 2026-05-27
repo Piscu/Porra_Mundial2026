@@ -56,6 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAdminLogin = document.getElementById('btn-admin-login');
   const btnAdminLogout = document.getElementById('btn-admin-logout');
   const adminMatchesList = document.getElementById('admin-matches-list');
+  const btnSyncFootballData = document.getElementById('btn-sync-football-data');
+  const btnSyncGitHub = document.getElementById('btn-sync-github');
+  const adminFootballDataKey = document.getElementById('admin-football-data-key');
+  const syncStatusMessage = document.getElementById('sync-status-message');
   
   const dbModal = document.getElementById('db-modal');
   const dbScriptUrl = document.getElementById('db-script-url');
@@ -439,8 +443,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Formatear Fecha
-      const dateObj = new Date(m.date);
+      // Formatear Fecha de forma robusta en UTC y mostrar en local
+      let dateStr = m.date;
+      if (dateStr && !dateStr.endsWith('Z') && !dateStr.includes('+') && dateStr.includes('T')) {
+        // Asegurarse de que no tenga otro offset antes de añadir Z
+        if (!/[-+]\d{2}:\d{2}$/.test(dateStr)) {
+          dateStr += 'Z';
+        }
+      }
+      const dateObj = new Date(dateStr);
       const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' }) + 
                             ' - ' + 
                             dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) + ' hs';
@@ -699,6 +710,100 @@ document.addEventListener('DOMContentLoaded', () => {
     adminControlSection.style.display = 'none';
     adminAuthSection.style.display = 'block';
     showToast('Sesión de administrador cerrada.');
+  }
+
+  // --- SINCRONIZACIÓN DE PARTIDOS DESDE API ---
+  
+  function handleSyncFootballData() {
+    if (!state.isAdminLoggedIn) {
+      showToast('Debes iniciar sesión como administrador primero.', 'error');
+      return;
+    }
+
+    const apiKey = adminFootballDataKey.value.trim();
+    showToast('Sincronizando con football-data.org...', 'pending');
+    
+    syncStatusMessage.style.display = 'block';
+    syncStatusMessage.textContent = '⏳ Sincronizando partidos...';
+    
+    const payload = {
+      action: 'syncMatches',
+      adminKey: state.adminKey,
+      source: 'football-data',
+      apiKey: apiKey
+    };
+
+    fetch(state.apiUrl, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast('✅ Sincronización completada desde football-data.org', 'success');
+        syncStatusMessage.textContent = '✅ ' + (data.message || 'Sincronización exitosa');
+        syncStatusMessage.style.color = 'var(--success)';
+        
+        // Recargar partidos
+        loadData();
+      } else {
+        showToast('❌ Error: ' + (data.message || 'No se pudo sincronizar'), 'error');
+        syncStatusMessage.textContent = '❌ ' + (data.message || 'Error durante la sincronización');
+        syncStatusMessage.style.color = 'var(--danger)';
+      }
+    })
+    .catch(err => {
+      showToast('Error de conexión: ' + err.message, 'error');
+      syncStatusMessage.textContent = '❌ Error de conexión: ' + err.message;
+      syncStatusMessage.style.color = 'var(--danger)';
+    });
+  }
+
+  function handleSyncGitHub() {
+    if (!state.isAdminLoggedIn) {
+      showToast('Debes iniciar sesión como administrador primero.', 'error');
+      return;
+    }
+
+    showToast('Sincronizando desde GitHub...', 'pending');
+    
+    syncStatusMessage.style.display = 'block';
+    syncStatusMessage.textContent = '⏳ Sincronizando partidos desde GitHub...';
+    
+    const payload = {
+      action: 'syncMatches',
+      adminKey: state.adminKey,
+      source: 'github'
+    };
+
+    fetch(state.apiUrl, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast('✅ Sincronización completada desde GitHub', 'success');
+        syncStatusMessage.textContent = '✅ ' + (data.message || 'Sincronización exitosa');
+        syncStatusMessage.style.color = 'var(--success)';
+        
+        // Recargar partidos
+        loadData();
+      } else {
+        showToast('❌ Error: ' + (data.message || 'No se pudo sincronizar'), 'error');
+        syncStatusMessage.textContent = '❌ ' + (data.message || 'Error durante la sincronización');
+        syncStatusMessage.style.color = 'var(--danger)';
+      }
+    })
+    .catch(err => {
+      showToast('Error de conexión: ' + err.message, 'error');
+      syncStatusMessage.textContent = '❌ Error de conexión: ' + err.message;
+      syncStatusMessage.style.color = 'var(--danger)';
+    });
   }
 
   function renderAdminMatches() {
@@ -973,6 +1078,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Admin login / logout
     btnAdminLogin.addEventListener('click', handleAdminLogin);
     btnAdminLogout.addEventListener('click', handleAdminLogout);
+    
+    // Sincronización de API
+    btnSyncFootballData.addEventListener('click', handleSyncFootballData);
+    btnSyncGitHub.addEventListener('click', handleSyncGitHub);
   }
 
   // Ejecutar inicialización

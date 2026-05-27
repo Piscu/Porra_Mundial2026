@@ -102,9 +102,17 @@
         <div class="filter-group" id="group-filters">
           <button class="filter-btn active" data-filter="all">Todos</button>
           <button class="filter-btn" data-filter="Grupo A">Grupo A</button>
+          <button class="filter-btn" data-filter="Grupo B">Grupo B</button>
           <button class="filter-btn" data-filter="Grupo C">Grupo C</button>
           <button class="filter-btn" data-filter="Grupo D">Grupo D</button>
           <button class="filter-btn" data-filter="Grupo E">Grupo E</button>
+          <button class="filter-btn" data-filter="Grupo F">Grupo F</button>
+          <button class="filter-btn" data-filter="Grupo G">Grupo G</button>
+          <button class="filter-btn" data-filter="Grupo H">Grupo H</button>
+          <button class="filter-btn" data-filter="Grupo I">Grupo I</button>
+          <button class="filter-btn" data-filter="Grupo J">Grupo J</button>
+          <button class="filter-btn" data-filter="Grupo K">Grupo K</button>
+          <button class="filter-btn" data-filter="Grupo L">Grupo L</button>
           <button class="filter-btn" data-filter="Eliminatorias">Fase Final</button>
         </div>
       </div>
@@ -218,6 +226,32 @@
             <button class="filter-btn" id="btn-admin-logout" style="background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.2); color: var(--danger);">
               Cerrar Panel
             </button>
+          </div>
+
+          <!-- Sincronización de API -->
+          <div style="background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 2rem;">
+            <h4 style="font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">🔄 Sincronizar Partidos desde API</h4>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+              Obtén automáticamente los partidos del Mundial 2026 desde football-data.org
+            </p>
+            
+            <div class="input-group" style="margin-bottom: 1rem;">
+              <label for="admin-football-data-key">API Key de football-data.org (Opcional)</label>
+              <input type="text" id="admin-football-data-key" class="input-field" placeholder="Obtén una gratis en https://www.football-data.org">
+              <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">
+                Sin autenticación: 10 solicitudes/minuto | Con clave: 10 solicitudes/minuto (plan gratuito)
+              </small>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <button class="btn btn-primary" id="btn-sync-football-data" style="background: rgba(76, 175, 80, 0.8);">
+                📊 Sincronizar Football-Data
+              </button>
+              <button class="btn btn-primary" id="btn-sync-github">
+                📁 Sincronizar desde GitHub
+              </button>
+            </div>
+            <div id="sync-status-message" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); display: none; white-space: pre-wrap;"></div>
           </div>
 
           <div class="admin-grid" id="admin-matches-list">

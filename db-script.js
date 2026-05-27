@@ -144,6 +144,9 @@ function doPost(e) {
     else if (action === "updateResult") {
       response = handleUpdateResult(postData.adminKey, postData.matchId, postData.scoreA, postData.scoreB);
     } 
+    else if (action === "syncMatches") {
+      response = handleSyncMatches(postData.adminKey, postData.source, postData.apiKey);
+    }
     else {
       response.message = "Acción POST desconocida.";
     }
@@ -449,4 +452,235 @@ function calculateLeaderboard() {
   });
   
   return leaderboard;
+}
+
+// ==========================================
+// NUEVAS FUNCIONES DE CONTROL DE API Y MENÚS
+// ==========================================
+
+/**
+ * Crea un menú personalizado en Google Sheets al abrir la hoja de cálculo
+ */
+function onOpen() {
+  const ui = SpreadsheetApp.getUi();
+  ui.createMenu("🏆 Porra Mundialista")
+    .addItem("🔄 Sincronizar Calendario (GitHub)", "menuSyncMatches")
+    .addToUi();
+}
+
+/**
+ * Función que ejecuta la sincronización desde el menú
+ */
+function menuSyncMatches() {
+  const ui = SpreadsheetApp.getUi();
+  const result = syncMatchesFromGitHubAPI();
+  
+  if (result.success) {
+    ui.alert("✅ Sincronización Exitosa", result.message, ui.ButtonSet.OK);
+  } else {
+    ui.alert("❌ Error de Sincronización", result.message, ui.ButtonSet.OK);
+  }
+}
+
+/**
+ * Controlador para la acción POST de sincronización
+ */
+function handleSyncMatches(adminKey, source, apiKey) {
+  if (adminKey !== ADMIN_PASSCODE) {
+    return { success: false, message: "Acceso no autorizado de administrador." };
+  }
+  
+  // source puede ser "github" (default), "football-data" o "both"
+  if (source === "football-data" || source === "both") {
+    return syncMatchesFromFootballData(apiKey || "");
+  }
+  
+  return syncMatchesFromGitHubAPI();
+}
+
+/**
+ * Sincroniza el calendario de partidos desde el API JSON de tu repositorio de GitHub Pages
+ */
+function syncMatchesFromGitHubAPI() {
+  const url = "https://piscu.github.io/Porra_Mundial2026/matches-api.json";
+  
+  try {
+    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    const code = response.getResponseCode();
+    
+    if (code !== 200) {
+      return { success: false, message: "Error al conectar con la API de GitHub (HTTP " + code + ")." };
+    }
+    
+    const matchesJson = JSON.parse(response.getContentText());
+    if (!Array.isArray(matchesJson)) {
+      return { success: false, message: "El formato de los partidos en el JSON de GitHub es incorrecto." };
+    }
+    
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheetMatches = ss.getSheetByName("Partidos");
+    
+    // Obtener los partidos actuales de la hoja
+    const data = sheetMatches.getDataRange().getValues();
+    
+    // Construir mapa de ID a fila para actualizar in-place
+    const matchIdToRowIndex = {};
+    for (let i = 1; i < data.length; i++) {
+      const matchId = parseInt(data[i][0]);
+      if (!isNaN(matchId)) {
+        matchIdToRowIndex[matchId] = i + 1; // Fila index-1 en Google Sheets
+      }
+    }
+    
+    let updatedCount = 0;
+    let addedCount = 0;
+    
+    matchesJson.forEach(m => {
+      const matchId = parseInt(m.id);
+      const rowIndex = matchIdToRowIndex[matchId];
+      
+      const rowData = [
+        matchId,
+        m.group,
+        m.teamA,
+        m.teamB,
+        m.date,
+        m.stadium,
+        m.logoA,
+        m.logoB
+      ];
+      
+      if (rowIndex) {
+        // Actualizar datos de columnas 1 a 8 in-place
+        // Mantenemos las columnas 9 y 10 (realScoreA, realScoreB) intactas para no alterar resultados reales
+        for (let col = 1; col <= 8; col++) {
+          sheetMatches.getRange(rowIndex, col).setValue(rowData[col - 1]);
+        }
+        updatedCount++;
+      } else {
+        // Añadir nuevo partido
+        sheetMatches.appendRow([...rowData, "", ""]);
+        addedCount++;
+      }
+    });
+    
+    return { 
+      success: true, 
+      message: "Sincronización completada.\n- Actualizados: " + updatedCount + "\n- Nuevos añadidos: " + addedCount 
+    };
+    
+  } catch (err) {
+    return { success: false, message: "Error al sincronizar: " + err.toString() };
+  }
+}
+
+/**
+ * Sincroniza el calendario de partidos desde football-data.org API
+ * Requiere una API key gratuita de https://www.football-data.org
+ */
+function syncMatchesFromFootballData(apiKey) {
+  // Si no se proporciona clave, usar llamada limitada
+  const apiKeyToUse = apiKey || ""; // Dejar vacío para pruebas limitadas
+  
+  const url = "https://api.football-data.org/v4/competitions/WC/matches";
+  
+  const headers = {
+    'X-Auth-Token': apiKeyToUse
+  };
+  
+  try {
+    const response = UrlFetchApp.fetch(url, {
+      headers: headers,
+      muteHttpExceptions: true
+    });
+    
+    const code = response.getResponseCode();
+    
+    if (code === 429) {
+      return { success: false, message: "Rate limit alcanzado. Intenta en unos minutos." };
+    }
+    
+    if (code !== 200) {
+      return { success: false, message: "Error de football-data.org (HTTP " + code + "). Intenta con una API key válida desde https://www.football-data.org" };
+    }
+    
+    const apiData = JSON.parse(response.getContentText());
+    
+    if (!apiData.matches || !Array.isArray(apiData.matches)) {
+      return { success: false, message: "Formato de respuesta de football-data.org inválido." };
+    }
+    
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheetMatches = ss.getSheetByName("Partidos");
+    const data = sheetMatches.getDataRange().getValues();
+    
+    // Mapear equipos de football-data a emojis (versión simplificada)
+    const countryEmojis = {
+      "Mexico": "🇲🇽", "South Africa": "🇿🇦", "Poland": "🇵🇱", "Sweden": "🇸🇪",
+      "Canada": "🇨🇦", "Tunisia": "🇹🇳", "Denmark": "🇩🇰", "South Korea": "🇰🇷",
+      "United States": "🇺🇸", "Bolivia": "🇧🇴", "Italy": "🇮🇹", "Cameroon": "🇨🇲",
+      "Argentina": "🇦🇷", "Algeria": "🇩🇿", "Croatia": "🇭🇷", "Japan": "🇯🇵",
+      "Spain": "🇪🇸", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Netherlands": "🇳🇱", "Colombia": "🇨🇴",
+      "France": "🇫🇷", "Ivory Coast": "🇨🇮", "Morocco": "🇲🇦", "Chile": "🇨🇱",
+      "Brazil": "🇧🇷", "Australia": "🇦🇺", "Switzerland": "🇨🇭", "Iran": "🇮🇷",
+      "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Ecuador": "🇪🇨", "Senegal": "🇸🇳", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+      "Germany": "🇩🇪", "Nigeria": "🇳🇬", "Ukraine": "🇺🇦", "Peru": "🇵🇪",
+      "Uruguay": "🇺🇾", "Belgium": "🇧🇪", "Costa Rica": "🇨🇷", "Portugal": "🇵🇹",
+      "Saudi Arabia": "🇸🇦", "Austria": "🇦🇹", "Ghana": "🇬🇭"
+    };
+    
+    const matchIdToRowIndex = {};
+    for (let i = 1; i < data.length; i++) {
+      const matchId = parseInt(data[i][0]);
+      if (!isNaN(matchId) && matchId <= 24) { // Solo partidos de grupos
+        matchIdToRowIndex[matchId] = i + 1;
+      }
+    }
+    
+    let updatedCount = 0;
+    let updatedMatches = [];
+    
+    // Procesar los primeros 24 partidos de grupos
+    const groupMatches = apiData.matches.filter(m => m.stage === 'GROUP_STAGE').slice(0, 24);
+    
+    groupMatches.forEach((m, idx) => {
+      const matchId = idx + 1;
+      const rowIndex = matchIdToRowIndex[matchId];
+      
+      const teamAEmoji = countryEmojis[m.homeTeam.name] || "⚽";
+      const teamBEmoji = countryEmojis[m.awayTeam.name] || "⚽";
+      
+      const rowData = [
+        matchId,
+        m.group || "Grupo A",
+        m.homeTeam.name,
+        m.awayTeam.name,
+        m.utcDate,
+        m.venue || "Por confirmar",
+        teamAEmoji,
+        teamBEmoji
+      ];
+      
+      if (rowIndex) {
+        // Actualizar
+        for (let col = 1; col <= 8; col++) {
+          sheetMatches.getRange(rowIndex, col).setValue(rowData[col - 1]);
+        }
+        updatedCount++;
+        updatedMatches.push(m.homeTeam.name + " vs " + m.awayTeam.name);
+      }
+    });
+    
+    if (updatedCount === 0) {
+      return { success: false, message: "No se actualizaron partidos. Verifica tu API key en https://www.football-data.org" };
+    }
+    
+    return { 
+      success: true, 
+      message: "✅ Sincronización con football-data.org completada!\nPartidos actualizados: " + updatedCount + "\n\n" + updatedMatches.join("\n")
+    };
+    
+  } catch (err) {
+    return { success: false, message: "Error al conectar con football-data.org: " + err.toString() + "\n\nTip: Obtén una API key gratuita en https://www.football-data.org/client/register" };
+  }
 }

@@ -75,4 +75,35 @@ Para compartir la porra con todos tus amigos de forma pública y gratuita:
 ## ⚙️ Personalización Adicional
 
 * **Editar Partidos**: Si deseas añadir más partidos o modificar los existentes, edita la lista dentro de [matches-data.js](file:///C:/Users/Piscu/.gemini/antigravity/scratch/porra-mundial-2026/matches-data.js) antes de subir el proyecto a GitHub, o actualízalos directamente en la pestaña `Partidos` de tu Google Sheet.
-* **Cambiar Puntuación**: Si quieres que acertar la tendencia otorgue 2 puntos en lugar de 1, puedes modificarlo fácilmente tanto en la línea ~370 del archivo [app.js](file:///C:/Users/Piscu/.gemini/antigravity/scratch/porra-mundial-2026/app.js) como en la línea ~470 del archivo [db-script.js](file:///C:/Users/Piscu/.gemini/antigravity/scratch/porra-mundial-2026/db-script.js).
+* **Cambiar Puntuación**: Si quieres que acertar la tendencia otorgue 2 puntos en lugar de 1, puedes modificarlo fácilmente tanto en la línea ~370 del archivo [app.js](file:///C:/Users/Piscu/.gemini\antigravity\scratch\porra-mundial-2026\app.js) como en la línea ~470 del archivo [db-script.js](file:///C:/Users/Piscu/.gemini\antigravity\scratch\porra-mundial-2026\db-script.js).
+
+---
+
+## 📊 Sincronizar Partidos desde football-data.org (Opcional)
+
+Para obtener automáticamente los datos actualizados del Mundial 2026 desde **football-data.org**, puedes:
+
+### Opción 1: Sin Autenticación (10 solicitudes/minuto)
+1. Ve a tu **Panel de Administrador** desde la app.
+2. En la sección **Sincronizar Partidos desde API**, haz clic en **📊 Sincronizar Football-Data**.
+3. Sin proporcionar una API key, se sincronizarán los partidos con límite básico de solicitudes.
+
+### Opción 2: Con API Key Gratuita (Recomendado)
+1. Crea una cuenta gratuita en [https://www.football-data.org/client/register](https://www.football-data.org/client/register).
+2. Obtén tu API key desde tu panel de control (es gratis).
+3. Ve a tu **Panel de Administrador** desde la app y pega tu API key en el campo "**API Key de football-data.org**".
+4. Haz clic en **📊 Sincronizar Football-Data**.
+5. Los partidos del Mundial 2026 se actualizarán automáticamente en tu Google Sheet.
+
+### Alternativa: Sincronizar desde GitHub
+Si prefieres actualizar los partidos manualmente, puedes:
+1. Editar el archivo [matches-api.json](file:///C:/Users/Piscu/.gemini\antigravity\scratch\porra-mundial-2026\matches-api.json) con los últimos partidos.
+2. Subirlo a tu repositorio de GitHub.
+3. Desde el **Panel de Administrador**, haz clic en **📁 Sincronizar desde GitHub** para cargar los datos.
+
+---
+
+## ⚙️ Personalización Adicional
+
+* **Editar Partidos**: Si deseas añadir más partidos o modificar los existentes, edita la lista dentro de [matches-data.js](file:///C:/Users/Piscu/.gemini\antigravity\scratch\porra-mundial-2026\matches-data.js) antes de subir el proyecto a GitHub, o actualízalos directamente en la pestaña `Partidos` de tu Google Sheet.
+* **Cambiar Puntuación**: Si quieres que acertar la tendencia otorgue 2 puntos en lugar de 1, puedes modificarlo fácilmente tanto en la línea ~370 del archivo [app.js](file:///C:/Users/Piscu\.gemini\antigravity\scratch\porra-mundial-2026\app.js) como en la línea ~470 del archivo [db-script.js](file:///C:/Users/Piscu\.gemini\antigravity\scratch\porra-mundial-2026\db-script.js).

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="La porra oficial del Mundial de Fútbol 2026. Organiza una quiniela deportiva con tus amigos y compañeros de trabajo de forma 100% gratuita.">
+  <title>Porra Mundial 2026 - Quiniela Deportiva</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast" role="alert" aria-live="assertive">
+    <span id="toast-icon">🏆</span>
+    <span id="toast-message">¡Marcador guardado con éxito!</span>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <span id="logo-icon">⚽</span> Porra <span>Mundial 2026</span>
+    </div>
+    
+    <div class="header-actions" id="header-actions" style="display: none;">
+      <div class="user-profile">
+        <div class="user-avatar" id="user-avatar-initial">U</div>
+        <span id="username-display">Usuario</span>
+      </div>
+      <button class="logout-btn" id="logout-btn">Salir</button>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="nav-container" id="main-nav" style="display: none;">
+    <div class="nav-tabs" role="tablist">
+      <button class="tab-btn active" id="tab-matches-btn" role="tab" aria-selected="true" aria-controls="tab-matches">
+        📅 Partidos
+      </button>
+      <button class="tab-btn" id="tab-leaderboard-btn" role="tab" aria-selected="false" aria-controls="tab-leaderboard">
+        🏆 Clasificación
+      </button>
+      <button class="tab-btn" id="tab-rules-btn" role="tab" aria-selected="false" aria-controls="tab-rules">
+        📜 Reglamento
+      </button>
+      <button class="tab-btn" id="tab-admin-btn" role="tab" aria-selected="false" aria-controls="tab-admin">
+        ⚙️ Admin
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Database Connection Banner -->
+    <div class="conn-banner" id="conn-banner">
+      <div class="conn-text">
+        <span id="conn-status-badge" class="conn-badge">Modo Demo Local</span>
+        <span id="conn-status-text">Los datos se guardan solo en tu navegador. Puedes conectarla a un Google Sheet compartido.</span>
+      </div>
+      <button class="filter-btn" id="btn-config-db" style="background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); color: white;">
+        🔗 Conectar Google Sheet
+      </button>
+    </div>
+
+    <!-- Auth View (Login / Register) -->
+    <div id="auth-view" class="auth-container">
+      <div class="auth-header">
+        <div class="auth-icon">🏆</div>
+        <h2 id="auth-title">Registrarse en la Porra</h2>
+        <p id="auth-subtitle">Crea tu usuario y únete a la diversión del mundial.</p>
+      </div>
+
+      <form id="auth-form" novalidate>
+        <div class="input-group">
+          <label for="auth-username">Nombre o Apodo</label>
+          <input type="text" id="auth-username" class="input-field" placeholder="Ej. JuanPerez, GolMaster" required minlength="3" maxlength="15">
+        </div>
+        
+        <div class="input-group">
+          <label for="auth-pin">Código PIN (4 dígitos)</label>
+          <input type="password" id="auth-pin" class="input-field" placeholder="••••" required pattern="[0-9]{4}" inputmode="numeric" maxlength="4">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-auth-submit">
+          Registrarme y Entrar
+        </button>
+      </form>
+
+      <div class="auth-switch">
+        <span id="auth-switch-text">¿Ya tienes un usuario creado?</span>
+        <a id="auth-switch-link">Iniciar Sesión</a>
+      </div>
+    </div>
+
+    <!-- Tab 1: Matches / Predictions -->
+    <section id="tab-matches" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h2>📅 Pronósticos del Mundial</h2>
+          <p>Ingresa tus marcadores previstos. ¡Haz clic en "Guardar" para registrar cada uno!</p>
+        </div>
+        
+        <div class="filter-group" id="group-filters">
+          <button class="filter-btn active" data-filter="all">Todos</button>
+          <button class="filter-btn" data-filter="Grupo A">Grupo A</button>
+          <button class="filter-btn" data-filter="Grupo C">Grupo C</button>
+          <button class="filter-btn" data-filter="Grupo D">Grupo D</button>
+          <button class="filter-btn" data-filter="Grupo E">Grupo E</button>
+          <button class="filter-btn" data-filter="Eliminatorias">Fase Final</button>
+        </div>
+      </div>
+
+      <div class="matches-grid" id="matches-container">
+        <!-- Rendered Dynamically via app.js -->
+      </div>
+    </section>
+
+    <!-- Tab 2: Leaderboard / Clasificación -->
+    <section id="tab-leaderboard" class="tab-content">
+      <div class="leaderboard-wrapper">
+        <div class="leaderboard-header">
+          <div class="leaderboard-title">
+            <span class="leaderboard-icon">🏆</span>
+            <h3>Tabla de Posiciones</h3>
+          </div>
+          <button class="filter-btn" id="btn-refresh-leaderboard" style="display: flex; align-items: center; gap: 0.5rem;">
+            🔄 Actualizar Tabla
+          </button>
+        </div>
+        
+        <div class="table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th scope="col" style="text-align: center;">Pos</th>
+                <th scope="col">Participante</th>
+                <th scope="col" style="text-align: center;">Puntos</th>
+                <th scope="col" style="text-align: center;">Plenos (3 pts)</th>
+                <th scope="col" style="text-align: center;">Aciertos (1 pt)</th>
+                <th scope="col" style="text-align: center;">Jugados</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody">
+              <!-- Rendered Dynamically via app.js -->
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 3rem;">
+                  No hay participantes registrados aún. ¡Registra tus pronósticos en la pestaña "Partidos" para comenzar!
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Rules / Reglamento -->
+    <section id="tab-rules" class="tab-content">
+      <div class="rules-wrapper">
+        <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 800; margin-bottom: 1rem;">📜 Reglamento de la Porra</h2>
+        <p class="rules-intro">
+          Participar es sumamente sencillo. Pon a prueba tus conocimientos sobre fútbol y compite con tus amigos sumando puntos por cada partido disputado.
+        </p>
+
+        <div class="rules-grid">
+          <div class="rule-card">
+            <div class="rule-points exact">3</div>
+            <div class="rule-title">Marcador Exacto (Pleno)</div>
+            <div class="rule-desc">Acertar el marcador exacto de goles del partido. Ej: Apostaste 2-1 y quedó 2-1.</div>
+          </div>
+          
+          <div class="rule-card">
+            <div class="rule-points outcome">1</div>
+            <div class="rule-title">Acierto de Resultado</div>
+            <div class="rule-desc">Acertar quién gana o si hay empate, pero no los goles exactos. Ej: Apostaste 2-0 y quedó 3-1.</div>
+          </div>
+          
+          <div class="rule-card">
+            <div class="rule-points none">0</div>
+            <div class="rule-title">Sin Puntos</div>
+            <div class="rule-desc">No acertar ni el ganador ni el empate. Ej: Apostaste 1-1 y quedó 2-3.</div>
+          </div>
+        </div>
+
+        <div class="rules-notes">
+          <h4>💡 Reglas Adicionales Importantes</h4>
+          <ul>
+            <li><strong>Tiempo Límite:</strong> Puedes ingresar o modificar tus pronósticos en cualquier momento antes de que comience cada partido. Una vez iniciado, los marcadores quedarán bloqueados para garantizar el juego limpio.</li>
+            <li><strong>Fases de Eliminación Directa:</strong> En octavos, cuartos, semis y final, el marcador válido de la quiniela es el que quede **al término del tiempo reglamentario de 90 minutos (más tiempo de descuento)**, sin contar prórroga ni tanda de penaltis (a menos que el administrador defina otra cosa).</li>
+            <li><strong>Clasificación compartida:</strong> En caso de empate en puntos en la clasificación, la posición se definirá según la cantidad de marcadores exactos acertados (Plenos).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Admin Panel -->
+    <section id="tab-admin" class="tab-content">
+      <div class="admin-wrapper">
+        <!-- Admin Access Screen -->
+        <div id="admin-auth-section" class="admin-auth-panel">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔑</div>
+          <h3 style="font-family: var(--font-display); font-weight: 700; margin-bottom: 0.5rem;">Panel de Administrador</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Ingresa la contraseña de administrador para poder registrar los resultados reales de los partidos.
+          </p>
+          <div class="input-group">
+            <label for="admin-passcode">Clave de Administrador</label>
+            <input type="password" id="admin-passcode" class="input-field" placeholder="Ingresa clave...">
+          </div>
+          <button class="btn btn-primary" id="btn-admin-login">Acceder al Panel</button>
+        </div>
+
+        <!-- Admin Control Panel (Hidden by default) -->
+        <div id="admin-control-section" style="display: none;">
+          <div class="admin-header">
+            <div>
+              <h3 style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 700;">⚙️ Actualizar Resultados del Mundial</h3>
+              <p style="color: var(--text-secondary); font-size: 0.85rem;">Registra los marcadores de los partidos reales para calcular la clasificación en tiempo real.</p>
+            </div>
+            <button class="filter-btn" id="btn-admin-logout" style="background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.2); color: var(--danger);">
+              Cerrar Panel
+            </button>
+          </div>
+
+          <div class="admin-grid" id="admin-matches-list">
+            <!-- Rendered Dynamically via app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Database Configuration Modal (Hidden by default) -->
+  <div id="db-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2.5rem; max-width: 550px; width: 90%; box-shadow: var(--shadow-lg); position: relative;">
+      <h3 style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; margin-bottom: 1rem; color: white; display: flex; align-items: center; gap: 0.5rem;">
+        🔗 Conectar Base de Datos de Google Sheets
+      </h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.6;">
+        Para jugar en modo multijugador con tus amigos, debes vincular tu porra con tu Google Sheet y Google Apps Script. 
+        <br><br>
+        Encuentra las instrucciones de configuración y el código en el archivo <code>db-script.js</code> del repositorio. Una vez que tengas tu URL de Web App de Google, pégala aquí:
+      </p>
+      
+      <div class="input-group">
+        <label for="db-script-url">URL de Google Apps Script (Web App)</label>
+        <input type="url" id="db-script-url" class="input-field" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+      
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button class="btn btn-primary" id="btn-save-db-url" style="flex: 1;">Vincular URL</button>
+        <button class="btn" id="btn-close-db-modal" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); width: auto; padding: 0 1.5rem;">
+          Cancelar
+        </button>
+      </div>
+      
+      <div id="db-url-clear-container" style="display: none; margin-top: 1rem; text-align: center;">
+        <a id="btn-clear-db-url" style="font-size: 0.85rem; color: var(--danger); text-decoration: underline; cursor: pointer;">
+          Desvincular URL y volver a Modo Demo
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 Porra Mundial. Desarrollado con ⚽ para el Mundial 2026.</p>
+    <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-muted);">
+      Código abierto en tu repositorio de GitHub. Alojado de forma gratuita.
+    </p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="matches-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

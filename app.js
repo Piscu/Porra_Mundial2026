@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch(state.apiUrl, {
         method: 'POST',
         mode: 'cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action, user: username, pin })
       })
       .then(res => res.json())
@@ -537,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch(state.apiUrl, {
         method: 'POST',
         mode: 'cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           action: 'savePrediction',
           user: state.currentUser,
@@ -652,7 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch(state.apiUrl, {
         method: 'POST',
         mode: 'cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           action: 'adminLogin',
           adminKey: passcode
@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch(state.apiUrl, {
         method: 'POST',
         mode: 'cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           action: 'updateResult',
           adminKey: state.adminKey,

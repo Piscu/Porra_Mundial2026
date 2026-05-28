@@ -1,109 +1,226 @@
-# 🏆 Porra Mundial de Fútbol 2026 - Quiniela Deportiva
+# ⚽ Porra Mundial 2026
 
-Bienvenido a la **Porra del Mundial 2026**, una aplicación web premium, moderna y responsiva diseñada para organizar una porra (quiniela, polla o penca) del Mundial de Fútbol 2026 con tus amigos, familiares y compañeros de trabajo de manera **100% gratuita** y sin complicaciones de servidores.
+Una aplicación web para hacer porras del mundial de fútbol 2026 con tus amigos. Alojada en GitHub Pages, con autenticación de usuarios, integrada con Google Sheets como backend y la API de football-data.org para los datos de partidos en tiempo real.
 
-Esta aplicación utiliza una arquitectura **Serverless**:
-* **Frontend**: Una SPA estática (Página única) hecha con Vanilla HTML, CSS (con Glassmorphism y temas deportivos oscuros) y JavaScript. Se despliega gratis en **GitHub Pages**.
-* **Base de Datos y Backend**: Un documento privado de **Google Sheets** que gestiona los datos de los usuarios mediante un **Google Apps Script** publicado como Web App (API REST). ¡Cero costos de mantenimiento!
+## 🚀 Características
+
+- **Sistema de Login**: Cada amigo tiene su propia cuenta y contraseña
+- **Partidos en tiempo real**: Calendario completo del mundial 2026 con scores actualizados
+- **Predicciones seguras**: Haz tus predicciones y sigue tu progreso
+- **Tabla de posiciones**: Sigue la clasificación de todos los grupos
+- **Clasificación General**: Ve la tabla de puntuaciones de todos los participantes
+- **Panel de Admin**: Control total sobre la configuración, usuarios y puntuaciones
+- **Base de datos en Google Sheets**: Almacenamiento seguro y sincronizado
+- **Sistema de puntuación automático**: Cálculo de puntos basado en aciertos
+- **Google Apps Script Backend**: Backend serverless completamente gratuito
+
+## 📋 Requisitos previos
+
+1. **Cuenta de GitHub** - para alojar la página
+2. **Cuenta de Google** - para Google Sheets y Google Apps Script
+3. **API Key de football-data.org** - gratuita en https://www.football-data.org/
+
+## 🔧 Configuración Completa
+
+### Paso 1: Obtener API Key de football-data.org
+
+1. Ve a https://www.football-data.org/
+2. Haz clic en "Sign Up" (es gratuito)
+3. Verifica tu email
+4. Copia tu API Key desde tu perfil
+
+### Paso 2: Configurar Google Sheets y Google Apps Script
+
+**IMPORTANTE**: Lee la guía completa en [GOOGLE_APPS_SCRIPT_SETUP.md](GOOGLE_APPS_SCRIPT_SETUP.md)
+
+En resumen:
+1. Crear un Google Sheet con las hojas necesarias (Usuarios, Predicciones, Puntuaciones, Configuración)
+2. Crear un Google Apps Script que sirva como backend
+3. Copiar la URL de deployment del Apps Script
+
+### Paso 3: Alojar en GitHub Pages
+
+1. Crea un nuevo repositorio en GitHub llamado `porra-mundial-2026`
+2. Marca la opción "Add a README file"
+3. Clona el repositorio en tu computadora
+4. Copia todos los archivos de esta carpeta al repositorio clonado
+5. Commit y push:
+   ```bash
+   git add .
+   git commit -m "Initial commit: Porra Mundial 2026"
+   git push origin main
+   ```
+6. Ve a Settings → Pages
+7. En "Build and deployment", selecciona:
+   - Source: Deploy from a branch
+   - Branch: main
+8. ¡Tu página estará disponible en `https://tunombre.github.io/porra-mundial-2026/`
+
+### Paso 4: Primera configuración en la app
+
+1. Abre la aplicación en tu navegador
+2. **Primeiro login**: Usa las credenciales de admin (configúralas en el Google Sheet)
+3. Ve al panel **Admin** (solo visible para admin)
+4. **Configuración General**:
+   - Actualiza la **API Key de football-data.org**
+   - Pega la **URL del Google Apps Script**
+   - Actualiza el **Google Sheet ID**
+5. **Usuarios**: Crea cuentas para todos tus amigos
+
+## 💻 Uso de la aplicación
+
+### Panel de Usuario (Participantes)
+
+1. **Partidos**: Ver los próximos partidos, filtrar por fase o estado, hacer predicciones
+2. **Clasificación**: Ver la tabla de posiciones del mundial
+3. **Clasificación General**: Ver el ranking de puntuaciones de todos los participantes
+4. **Configuración**: Cambiar contraseña y exportar datos
+
+### Panel de Admin (Solo para ti)
+
+1. **Configuración General**:
+   - Administrar API Key
+   - Configurar Google Apps Script
+   - Cambiar contraseña de admin
+
+2. **Puntuaciones**:
+   - Ajustar el sistema de puntuación
+   - Recalcular puntos
+
+3. **Usuarios**:
+   - Ver lista de participantes
+   - Agregar nuevos usuarios
+   - Eliminar usuarios
+
+4. **Respaldo**:
+   - Sincronizar con Google Sheets
+   - Exportar datos de respaldo
+
+## 🎯 Sistema de puntuación
+
+La puntuación se calcula así (valores por defecto, ajustables por el admin):
+
+- **Resultado exacto**: 3 puntos (ej: predice 2-1 y es 2-1)
+- **Ganador/Empate correcto**: 1 punto (ej: predice 2-1 y es 3-1)
+- **Diferencia de goles correcta**: 1 punto extra (ej: predice 2-0 y es 3-1, ambos tienen diferencia de 1)
+
+Puntuación máxima por partido: 3 puntos
+
+## 🏗️ Arquitectura
+
+### Frontend (GitHub Pages)
+- HTML5, CSS3, JavaScript Vanilla
+- Interfaz responsive
+- Login seguro
+
+### Backend (Google Apps Script)
+- Autenticación de usuarios
+- Gestión de predicciones
+- Cálculo de puntuaciones
+- API para frontend
+
+### Base de datos (Google Sheets)
+- Almacenamiento de usuarios
+- Predicciones de todos los participantes
+- Puntuaciones
+- Configuración del sistema
+
+### APIs externas
+- **football-data.org**: Datos de partidos en tiempo real
+
+## 🔒 Privacidad y seguridad
+
+- **Contraseñas**: Se guardan en Google Sheets (considera encriptarlas para producción)
+- **API Key**: Manejada únicamente por el admin, no se envía al cliente
+- **Datos**: Sincronizados de forma segura a través de Google Apps Script
+- **GitHub Pages**: Hosting estático, sin acceso a datos sensibles
+
+## 📁 Estructura del proyecto
+
+```
+porra-mundial-2026/
+├── index.html                      # Página principal
+├── README.md                       # Este archivo
+├── GOOGLE_APPS_SCRIPT_SETUP.md    # Guía de configuración del backend
+├── INICIO_RAPIDO.txt              # Guía rápida
+├── .gitignore                     # Archivos a ignorar
+├── css/
+│   └── styles.css                 # Estilos
+├── js/
+│   ├── config.js                  # Configuración general
+│   ├── auth.js                    # Sistema de autenticación
+│   ├── api.js                     # Integración con football-data.org
+│   ├── backend.js                 # Integración con Google Apps Script
+│   ├── sheets.js                  # Integración con Google Sheets
+│   ├── admin.js                   # Lógica del panel admin
+│   ├── ui.js                      # Lógica de interfaz
+│   └── app.js                     # Lógica principal
+├── img/                           # Carpeta para imágenes
+└── .github/
+    ├── copilot-instructions.md
+    └── workflows/
+        └── deploy.yml             # GitHub Actions
+```
+
+## 🚀 Despliegue y actualización
+
+### Desplegar cambios
+
+```bash
+git add .
+git commit -m "Descripción del cambio"
+git push origin main
+```
+
+GitHub Pages se actualiza automáticamente en pocos minutos.
+
+## 🐛 Solución de problemas
+
+### "Error de autenticación"
+- Verifica que el usuario existe en el Google Sheet
+- Revisa la contraseña
+
+### "No aparecen los partidos"
+- Verifica que la API Key sea correcta
+- Revisa tu conexión a internet
+- Intenta refrescar la página
+
+### "Error al conectar con Google Apps Script"
+- Verifica que la URL del Apps Script sea correcta
+- Asegúrate de que esté desplegado
+- Revisa que tengas permisos en el Google Sheet
+
+### "Las puntuaciones no se actualizan"
+- Haz clic en "Sincronizar Ahora" desde el panel Admin
+- Recalcula las puntuaciones desde Admin → Puntuaciones
+
+## 📊 Características avanzadas (Próximas)
+
+- Encriptación de contraseñas
+- Notificaciones de partidos próximos
+- Sistema de ligas privadas
+- Historial detallado de predicciones
+- Exportación de reportes
+- Tema oscuro
+
+## 🤝 Contribuir
+
+¿Tienes ideas para mejorar? ¡Siéntete libre de sugerir cambios!
+
+## 📝 Licencia
+
+Este proyecto es de código abierto bajo la licencia MIT.
+
+## 🙏 Créditos
+
+- **Datos de partidos**: [football-data.org](https://www.football-data.org/)
+- **Alojamiento**: [GitHub Pages](https://pages.github.com/)
+- **Backend**: [Google Apps Script](https://script.google.com/)
+- **Base de datos**: [Google Sheets](https://sheets.google.com/)
 
 ---
 
-## ✨ Características de la Porra
+**¡Que disfrutes la porra del Mundial 2026!** ⚽🏆
 
-1. **Diseño de Alta Calidad**: Interfaz visual ultra-premium, con estética deportiva oscura, acentos verde césped/dorado y diseño completamente adaptado a móviles.
-2. **Modo Demo Local**: Si abres la página por primera vez, el sistema funcionará en modo local usando el almacenamiento del navegador. ¡Generará 3 amigos simulados con pronósticos e historial para que puedas probar cómo funciona la tabla de clasificación antes de conectar nada!
-3. **Inicio de Sesión PIN Seguro**: Los usuarios se registran con su apodo y un código PIN de 4 dígitos. Así, tus amigos no podrán editar ni sabotear los marcadores de otros.
-4. **Cálculo Automático de Puntos**: 
-   * **3 Puntos** por acertar el resultado exacto (Pleno).
-   * **1 Punto** por acertar la tendencia (ganador o empate), pero no los goles exactos.
-   * **0 Puntos** si no aciertas el resultado.
-5. **Panel del Administrador**: Sección protegida con contraseña desde donde puedes registrar los marcadores reales de los partidos a medida que se jueguen, recalculando al instante la clasificación de todo el grupo.
-6. **Control de Tiempo Limpio**: El sistema bloquea automáticamente la entrada de pronósticos para cualquier partido una vez que llega su hora de juego oficial para evitar trampas.
+Para configurar el backend con Google Apps Script, lee [GOOGLE_APPS_SCRIPT_SETUP.md](GOOGLE_APPS_SCRIPT_SETUP.md)
 
----
-
-## 🛠️ Instrucciones de Configuración Paso a Paso
-
-Configurar la porra para tu grupo te tomará menos de 10 minutos si sigues estos sencillos pasos:
-
-### Paso 1: Configurar la Base de Datos en Google Sheets
-
-1. Crea una nueva hoja de cálculo en Google Sheets (puedes usar el atajo rápido [sheets.new](https://sheets.new)).
-2. En el menú superior de la hoja, haz clic en **Extensiones** ➡️ **Apps Script**.
-3. Borra cualquier código que aparezca por defecto en el editor.
-4. Abre el archivo [db-script.js](file:///C:/Users/Piscu/.gemini/antigravity/scratch/porra-mundial-2026/db-script.js) de este repositorio, **copia todo su contenido** y pégalo en el editor de Apps Script.
-   * *Opcional:* Al inicio del código, puedes cambiar la contraseña de administrador predeterminada (`"admin123"`) por la que tú desees.
-5. En la barra de herramientas superior del editor, asegúrate de que esté seleccionada la función **`setupDatabase`** en el menú desplegable y haz clic en **Ejecutar** (Ejecutar ▶).
-   * Google te pedirá autorizar los permisos del script. Concede todos los accesos (haz clic en *Configuración Avanzada* ➡️ *Ir a Proyecto (no seguro)* y permite el acceso).
-   * Esto creará automáticamente las pestañas necesarias (`Partidos`, `Pronosticos` y `Usuarios`) con sus encabezados oficiales en tu hoja de cálculo.
-6. Haz clic en el botón superior derecho **Implementar** ➡️ **Nueva implementación**.
-7. Selecciona el tipo de implementación haciendo clic en el engranaje ⚙️ y elige **Aplicación web**.
-8. Configura los parámetros:
-   * **Descripción**: Porra Mundial 2026 API.
-   * **Ejecutar como**: "Tú" (tu correo de Google).
-   * **Quién tiene acceso**: **"Cualquiera"** *(Esta parte es crucial para que la página web pueda enviar los datos de tus amigos)*.
-9. Haz clic en **Implementar**.
-10. Copia la **URL de la aplicación web** generada (es una dirección larga que termina en `/exec`).
-
-### Paso 2: Vincular el Frontend con Google Sheets
-
-1. Abre el archivo [index.html](file:///C:/Users/Piscu/.gemini/antigravity/scratch/porra-mundial-2026/index.html) en tu navegador.
-2. Verás un banner azul superior indicando que estás en **Modo Demo Local**.
-3. Haz clic en el botón **🔗 Conectar Google Sheet**.
-4. Pega la **URL de la aplicación web (Web App URL)** que copiaste en el paso anterior y haz clic en **Vincular URL**.
-5. ¡Listo! El banner cambiará a color verde confirmando que estás **Conectado a Google Sheets**. A partir de ahora, todo lo que hagan tus amigos se guardará directamente en tu hoja de cálculo privada.
-
----
-
-## 🚀 Despliegue Gratis en GitHub Pages
-
-Para compartir la porra con todos tus amigos de forma pública y gratuita:
-
-1. Crea una cuenta en [GitHub](https://github.com) si no tienes una.
-2. Crea un nuevo repositorio público (ej. `porra-mundial-2026`).
-3. Sube todos los archivos de esta carpeta a tu repositorio (`index.html`, `styles.css`, `app.js`, `matches-data.js`, `db-script.js`, `README.md`).
-4. Ve a la pestaña **Settings** (Configuración) de tu repositorio.
-5. En el menú de la izquierda, haz clic en **Pages**.
-6. En la sección **Build and deployment**:
-   * Source: *Deploy from a branch*.
-   * Branch: Selecciona **`main`** (o `master`) y la carpeta **`/(root)`**.
-   * Haz clic en **Save** (Guardar).
-7. Espera aproximadamente 1 minuto. GitHub generará un enlace público (ej. `https://tu-usuario.github.io/porra-mundial-2026/`) desde donde todos tus amigos podrán ingresar en cualquier momento, registrarse y jugar.
-
----
-
-## ⚙️ Personalización Adicional
-
-* **Editar Partidos**: Si deseas añadir más partidos o modificar los existentes, edita la lista dentro de [matches-data.js](file:///C:/Users/Piscu/.gemini/antigravity/scratch/porra-mundial-2026/matches-data.js) antes de subir el proyecto a GitHub, o actualízalos directamente en la pestaña `Partidos` de tu Google Sheet.
-* **Cambiar Puntuación**: Si quieres que acertar la tendencia otorgue 2 puntos en lugar de 1, puedes modificarlo fácilmente tanto en la línea ~370 del archivo [app.js](file:///C:/Users/Piscu/.gemini\antigravity\scratch\porra-mundial-2026\app.js) como en la línea ~470 del archivo [db-script.js](file:///C:/Users/Piscu/.gemini\antigravity\scratch\porra-mundial-2026\db-script.js).
-
----
-
-## 📊 Sincronizar Partidos desde football-data.org (Opcional)
-
-Para obtener automáticamente los datos actualizados del Mundial 2026 desde **football-data.org**, puedes:
-
-### Opción 1: Sin Autenticación (10 solicitudes/minuto)
-1. Ve a tu **Panel de Administrador** desde la app.
-2. En la sección **Sincronizar Partidos desde API**, haz clic en **📊 Sincronizar Football-Data**.
-3. Sin proporcionar una API key, se sincronizarán los partidos con límite básico de solicitudes.
-
-### Opción 2: Con API Key Gratuita (Recomendado)
-1. Crea una cuenta gratuita en [https://www.football-data.org/client/register](https://www.football-data.org/client/register).
-2. Obtén tu API key desde tu panel de control (es gratis).
-3. Ve a tu **Panel de Administrador** desde la app y pega tu API key en el campo "**API Key de football-data.org**".
-4. Haz clic en **📊 Sincronizar Football-Data**.
-5. Los partidos del Mundial 2026 se actualizarán automáticamente en tu Google Sheet.
-
-### Alternativa: Sincronizar desde GitHub
-Si prefieres actualizar los partidos manualmente, puedes:
-1. Editar el archivo [matches-api.json](file:///C:/Users/Piscu/.gemini\antigravity\scratch\porra-mundial-2026\matches-api.json) con los últimos partidos.
-2. Subirlo a tu repositorio de GitHub.
-3. Desde el **Panel de Administrador**, haz clic en **📁 Sincronizar desde GitHub** para cargar los datos.
-
----
-
-## ⚙️ Personalización Adicional
-
-* **Editar Partidos**: Si deseas añadir más partidos o modificar los existentes, edita la lista dentro de [matches-data.js](file:///C:/Users/Piscu/.gemini\antigravity\scratch\porra-mundial-2026\matches-data.js) antes de subir el proyecto a GitHub, o actualízalos directamente en la pestaña `Partidos` de tu Google Sheet.
-* **Cambiar Puntuación**: Si quieres que acertar la tendencia otorgue 2 puntos en lugar de 1, puedes modificarlo fácilmente tanto en la línea ~370 del archivo [app.js](file:///C:/Users/Piscu\.gemini\antigravity\scratch\porra-mundial-2026\app.js) como en la línea ~470 del archivo [db-script.js](file:///C:/Users/Piscu\.gemini\antigravity\scratch\porra-mundial-2026\db-script.js).

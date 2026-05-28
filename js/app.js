@@ -11,6 +11,15 @@ class PorraApp {
             // Cargar configuración guardada
             const savedApiKey = getFromLocalStorage(CONFIG.STORAGE_KEYS.API_KEY);
             const savedSheetId = getFromLocalStorage(CONFIG.STORAGE_KEYS.SHEET_ID);
+            const savedAppsScriptUrl = getFromLocalStorage(CONFIG.STORAGE_KEYS.APPS_SCRIPT_URL);
+
+            // Inicializar Backend API
+            if (savedAppsScriptUrl) {
+                window.backendAPI = new BackendAPI(savedAppsScriptUrl);
+            } else {
+                // Crear instancia vacía (se configurará en admin)
+                window.backendAPI = new BackendAPI('');
+            }
 
             if (savedApiKey) {
                 initFootballAPI(savedApiKey);
@@ -18,6 +27,11 @@ class PorraApp {
 
             if (savedSheetId) {
                 initGoogleSheets(savedSheetId);
+            }
+
+            // Inicializar AuthManager si no existe
+            if (!window.authManager) {
+                window.authManager = new AuthManager();
             }
 
             this.initialized = true;

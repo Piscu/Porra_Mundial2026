@@ -29,7 +29,18 @@ class AuthManager {
         
         try {
             // Validar credenciales con el backend
-            const response = await backendAPI.validateUser(username, password);
+            // Usar getBackendAPI() si está disponible, o fallback a window.backendAPI
+            let api = null;
+            if (typeof getBackendAPI === 'function') {
+                api = getBackendAPI();
+            }
+            api = api || window.backendAPI || (typeof backendAPI !== 'undefined' ? backendAPI : null);
+
+            if (!api) {
+                throw new Error('backendAPI no inicializado');
+            }
+
+            const response = await api.validateUser(username, password);
             
             if (response.success) {
                 this.currentUser = {

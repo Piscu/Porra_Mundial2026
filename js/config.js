@@ -114,7 +114,13 @@ function saveToLocalStorage(key, value) {
 function getFromLocalStorage(key) {
     try {
         const value = localStorage.getItem(key);
-        return value ? JSON.parse(value) : null;
+        if (!value) return null;
+        try {
+            return JSON.parse(value);
+        } catch (parseError) {
+            // Valor guardado como string sin JSON
+            return value;
+        }
     } catch (error) {
         console.error('Error obteniendo de localStorage:', error);
         return null;

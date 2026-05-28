@@ -13,12 +13,25 @@ class PorraApp {
             const savedSheetId = getFromLocalStorage(CONFIG.STORAGE_KEYS.SHEET_ID);
             const savedAppsScriptUrl = getFromLocalStorage(CONFIG.STORAGE_KEYS.APPS_SCRIPT_URL);
 
-            // Inicializar Backend API
-            if (savedAppsScriptUrl) {
-                window.backendAPI = new BackendAPI(savedAppsScriptUrl);
+            // Inicializar Backend API (usa initBackendAPI si está disponible)
+            if (typeof initBackendAPI === 'function') {
+                if (savedAppsScriptUrl) {
+                    initBackendAPI(savedAppsScriptUrl);
+                } else {
+                    initBackendAPI('');
+                }
+
+                // Exponer también en window por compatibilidad
+                if (typeof backendAPI !== 'undefined') {
+                    window.backendAPI = backendAPI;
+                }
             } else {
-                // Crear instancia vacía (se configurará en admin)
-                window.backendAPI = new BackendAPI('');
+                // Fallback: crear instancia en window
+                if (savedAppsScriptUrl) {
+                    window.backendAPI = new BackendAPI(savedAppsScriptUrl);
+                } else {
+                    window.backendAPI = new BackendAPI('');
+                }
             }
 
             if (savedApiKey) {
